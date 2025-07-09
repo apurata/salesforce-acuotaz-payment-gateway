@@ -21,15 +21,16 @@ Este roadmap está diseñado para desarrolladores sin experiencia previa en Sale
   - ISML (Internet Store Markup Language)
 
 ### 1.2 Recursos de Aprendizaje
-- [ ] Trailhead: Salesforce Commerce Cloud Basics
-- [ ] Documentación oficial de SFCC
-- [ ] Sandbox de práctica (solicitar a Salesforce)
+- [✅] Trailhead: Salesforce Commerce Cloud Basics
+- [✅] Documentación oficial de SFCC
+- [✅] Sandbox de práctica (solicitar a Salesforce)
 - [ ] Instalación de UX Studio o VS Code con extensiones SFCC
 
 ### 1.3 Configuración del Entorno
-- [ ] Obtener acceso al Business Manager
-- [ ] Configurar herramientas de desarrollo
-- [ ] Familiarizarse con la interfaz del Business Manager
+- [✅] Obtener acceso al Business Manager
+- [ ] Configurar una tienda SFRA (Storefront Reference Architecture) - **Ver guía detallada en README.md**
+- [✅] Configurar herramientas de desarrollo
+- [✅] Familiarizarse con la interfaz del Business Manager
 
 ---
 
