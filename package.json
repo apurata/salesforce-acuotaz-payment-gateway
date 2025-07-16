@@ -1,7 +1,7 @@
 {
   "name": "int_acuotaz",
-  "version": "0.0.1",
-  "description": "New overlay cartridge",
+  "version": "1.0.0",
+  "description": "acuotaz payment cartridge",
   "main": "index.js",
   "scripts": {
     "lint": "sgmf-scripts --lint js && sgmf-scripts --lint css",
