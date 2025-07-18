@@ -1,0 +1,12 @@
+<isloop items="${pdict.order.billing.payment.applicablePaymentMethods}" var="paymentOption" status="loopState">
+    <isif condition="${paymentOption.ID === 'CREDIT_CARD'}">
+        <isinclude template="checkout/billing/paymentOptions/creditCardTab" />
+    </isif>
+    <isif condition="${paymentOption.ID === 'ACUOTAZ_PM'}">
+        <li class="nav-item" data-method-id="${paymentOption.ID}">
+            <a class="nav-link" data-toggle="tab" href="#acuotaz-content" role="tab">
+                <img src="https://apurata.com/app/img/logo-acuotaz.png" height="32" alt="aCuotaz" />
+            </a>
+        </li>
+    </isif>
+</isloop>
