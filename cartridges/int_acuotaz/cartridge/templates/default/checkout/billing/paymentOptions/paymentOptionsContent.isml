@@ -1,0 +1,15 @@
+<isloop items="${pdict.order.billing.payment.applicablePaymentMethods}" var="paymentOption">
+    <isif condition="${paymentOption.ID === 'CREDIT_CARD'}">
+        <isinclude template="checkout/billing/paymentOptions/creditCardContent" />
+    </isif>
+    <isif condition="${paymentOption.ID === 'ACUOTAZ_PM'}">
+        <div class="tab-pane active" id="acuotaz-content" role="tabpanel">
+            <fieldset class="payment-form-fields">
+            PAYMENT MOCKER
+            <input type="hidden" class="form-control"
+               name="${pdict.forms.billingForm.paymentMethod.htmlName}"
+               value="ACUOTAZ_PM">
+          </fieldset>
+        </div>
+    </isif>
+</isloop>
