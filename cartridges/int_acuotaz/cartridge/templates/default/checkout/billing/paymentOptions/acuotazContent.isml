@@ -1,0 +1,15 @@
+<div class="tab-pane acuotaz-content" id="acuotaz-content" role="tabpanel">
+    <fieldset class="payment-form-fields">
+        <input type="hidden" class="form-control"
+               name="${pdict.forms.billingForm.paymentMethod.htmlName}"
+               value="ACUOTAZ_PM"
+        >
+        <div class="row">
+            <div class="col">
+                <div class="acuotaz-message alert alert-info">
+                    ${Resource.msg('msg.payment.acuotaz.description', 'payment', null)}
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</div>
