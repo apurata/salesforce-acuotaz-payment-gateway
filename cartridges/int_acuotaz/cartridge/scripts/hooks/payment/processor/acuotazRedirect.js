@@ -3,7 +3,7 @@
 var Transaction = require('dw/system/Transaction');
 var Resource = require('dw/web/Resource');
 var Logger = require('dw/system/Logger');
-var log = Logger.getLogger('int_acuotaz', 'payment');
+var log = Logger.getLogger('int_acuotaz', 'acuotaz');
 
 /**
  * Handle the payment processing

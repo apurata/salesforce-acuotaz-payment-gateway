@@ -1,7 +1,7 @@
 'use strict';
 
 var Logger = require('dw/system/Logger');
-var log = Logger.getLogger('int_acuotaz', 'payment');
+var log = Logger.getLogger('int_acuotaz', 'acuotaz');
 
 /**
  * Verifies the required information for billing form is provided.
