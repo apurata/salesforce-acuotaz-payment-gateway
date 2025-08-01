@@ -134,7 +134,7 @@ dist
 .pnp.*
 .yarn/*
 !.yarn/patches
-!.yarn/plugins
+!.yarn/plugins 
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
@@ -142,3 +142,6 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Payment Salesforce Plugin
+payment-salesforce-plugin-main/
