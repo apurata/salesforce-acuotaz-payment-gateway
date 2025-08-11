@@ -91,7 +91,7 @@ function Authorize(orderNumber, paymentInstrument, paymentProcessor) {
     var payload = {
         amount: order.totalGrossPrice.value,
         order_id: order.orderNo,
-        pos_client_id: 'custom_test',
+        pos_client_id: posClientId,
         description: 'Order #' + order.orderNo,
         url_redir_on_canceled   : URLUtils.https('Checkout-Failure', 'orderID', order.orderNo).toString(),
         url_redir_on_rejected   : URLUtils.https('Checkout-Failure', 'orderID', order.orderNo).toString(),
@@ -111,9 +111,17 @@ function Authorize(orderNumber, paymentInstrument, paymentProcessor) {
     // --- 3. Llama a Apurata ---
     var client = new HTTPClient();
     client.setTimeout(10000);
+    var Site = require('dw/system/Site');
+    var bearerToken  = Site.getCurrent().getCustomPreferenceValue('acuotazBearerToken');
+    var posClientId = Site.getCurrent().getCustomPreferenceValue('acuotazPosClientId');
+    log.info('Acuotaz - bearerToken: {0}', bearerToken);
     client.open('POST', 'https://apurata.com/pos/order/create');
     client.setRequestHeader('Content-Type', 'application/json');
-    client.setRequestHeader('Authorization', 'Bearer 73d0a5f98b12442e892d8ce9c54902bd');
+    if (bearerToken) {
+        client.setRequestHeader('Authorization', 'Bearer ' + bearerToken);
+    } else {
+        log.warn('aCuotaz Payment - Handle - Bearer token no configurado en preferencias.');
+    }
     client.send(JSON.stringify(payload));
 
     if (client.statusCode !== 200) {

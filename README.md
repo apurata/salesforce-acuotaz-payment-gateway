@@ -200,3 +200,16 @@ If you encounter problems:
 ---
 
 **Note:** This guide is based on the latest version of SFRA. Steps may vary slightly depending on the specific version of your Salesforce Commerce Cloud instance.
+
+### Acuotaz Bearer Token
+Configura tus credenciales una sola vez y olvídate del código:
+
+**Valores requeridos**
+* **Acuotaz Bearer Token** – se usa en la cabecera `Authorization`.
+* **Acuotaz POS Client ID** – se envía en el payload `pos_client_id`.
+
+1. En Business Manager ve a **Administration → Site Development → Import & Export**.  En la sección *Meta Data*, **sube** (Upload) el archivo `site-preferences-acuotaz.xml` y luego haz **Import** para procesarlo.
+2. Cuando la importación termine, ve a **Merchant Tools → Site Preferences → Custom Preferences → Acuotaz**.
+3. Completa los dos campos y guarda:
+   * **Acuotaz Bearer Token**
+   * **Acuotaz POS Client ID**
