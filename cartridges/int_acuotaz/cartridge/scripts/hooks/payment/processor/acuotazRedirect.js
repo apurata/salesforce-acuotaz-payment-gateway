@@ -16,8 +16,8 @@ function Handle(basket) {
   var paymentInstruments;
   var iterator;
 
-  log.debug(
-    'aCuotaz Payment - Handle - Start processing payment for basket {0}',
+  log.info(
+    'aCuotaz Payment - Handle - DEBUG: INICIANDO Handle para basket {0}',
     basket.UUID
   );
 
@@ -41,10 +41,14 @@ function Handle(basket) {
       );
     });
 
-    log.debug(
-      'aCuotaz Payment - Handle - Payment instrument created successfully'
+    log.info(
+      'aCuotaz Payment - Handle - DEBUG: Payment instrument created successfully'
     );
-    return { error: false };
+    
+    var result = { error: false };
+    log.info('aCuotaz Payment - Handle - DEBUG: Retornando resultado: {0}', JSON.stringify(result));
+    
+    return result;
   } catch (e) {
     log.error(
       'aCuotaz Payment - Handle - Error creating payment instrument: {0}',
@@ -65,37 +69,91 @@ function Handle(basket) {
  * @returns {Object} Object with error information
  */
 function Authorize(orderNumber, paymentInstrument, paymentProcessor) {
-  log.debug(
-    'aCuotaz Payment - Authorize - Start authorization for order {0}',
-    orderNumber
-  );
+    log.info('Acuotaz - Authorize iniciado para order {0}', orderNumber);
 
-  try {
+    var OrderMgr   = require('dw/order/OrderMgr');
+    var URLUtils   = require('dw/web/URLUtils');
+    var HTTPClient = require('dw/net/HTTPClient');
+
+    // --- 1. Recupera la orden ---
+    var order = OrderMgr.getOrder(orderNumber);
+    if (!order) {
+        log.error('Acuotaz - no se encontró la orden {0}', orderNumber);
+        return { error: true };
+    }
+    else {
+        log.info('Acuotaz – order: {0}', JSON.stringify(order));
+    }
+
+    log.info('Acuotaz – order: {0}', JSON.stringify(order));
+    
+    // --- 2. Construye el payload para la API de Apurata ---
+    var payload = {
+        amount: order.totalGrossPrice.value,
+        order_id: order.orderNo,
+        pos_client_id: 'custom_test',
+        description: 'Order #' + order.orderNo,
+        url_redir_on_canceled   : URLUtils.https('Checkout-Failure', 'orderID', order.orderNo).toString(),
+        url_redir_on_rejected   : URLUtils.https('Checkout-Failure', 'orderID', order.orderNo).toString(),
+        url_redir_on_success    : URLUtils.https('Checkout-ThankYou', 'orderID', order.orderNo).toString(),
+        url_redir_on_order_detail: URLUtils.https('Checkout-ThankYou', 'orderID', order.orderNo).toString(),
+        url_redir_on_downpayment: URLUtils.https('Checkout-ThankYou', 'orderID', order.orderNo).toString(),
+        customer_data: {
+            address      : order.billingAddress.address1,
+            dni          : order.customerNo || '',
+            email        : order.customerEmail,
+            name         : order.billingAddress.fullName,
+            phone        : order.billingAddress.phone,
+            billing_city : order.billingAddress.city
+        }
+    };
+
+    // --- 3. Llama a Apurata ---
+    var client = new HTTPClient();
+    client.setTimeout(10000);
+    client.open('POST', 'https://apurata.com/pos/order/create');
+    client.setRequestHeader('Content-Type', 'application/json');
+    client.setRequestHeader('Authorization', 'Bearer 73d0a5f98b12442e892d8ce9c54902bd');
+    client.send(JSON.stringify(payload));
+
+    if (client.statusCode !== 200) {
+        log.error('Acuotaz - error HTTP {0}: {1}', client.statusCode, client.text);
+        return { error: true };
+    }
+
+    var redirectURL;
+    try {
+        var responseObj = JSON.parse(client.text);
+        log.info('Acuotaz - responseObj: {0}', JSON.stringify(responseObj.redirect_to));
+        redirectURL = responseObj.redirect_to;
+    } catch (e) {
+        log.error('Acuotaz - no se pudo parsear la respuesta: {0}', e.message);
+        return { error: true };
+    }
+
+    if (!redirectURL) {
+        log.error('Acuotaz - la respuesta no contiene redirect_url');
+        return { error: true };
+    }
+
+    // --- 4. Marca la orden como NO PAGADA y asigna la transacción ---
+    var Order = require('dw/order/Order');
     Transaction.wrap(function () {
-      log.debug('aCuotaz Payment - Authorize - Setting transaction data');
-      paymentInstrument.paymentTransaction.setTransactionID(orderNumber);
-      paymentInstrument.paymentTransaction.setPaymentProcessor(paymentProcessor);
+        order.setPaymentStatus(Order.PAYMENT_STATUS_NOTPAID);
+        
+        paymentInstrument.paymentTransaction.setTransactionID(orderNumber);
+        paymentInstrument.paymentTransaction.setPaymentProcessor(paymentProcessor);
+
+        // Guarda la URL generada por aCuotaz (custom.redirectURL debe existir o elimínalo)
+        order.custom.redirectURL = redirectURL;
     });
 
-    log.debug([
-      'aCuotaz Payment - Authorize - Authorization successful,',
-      'redirecting to apurata.com'
-    ].join(' '));
+    log.info('Acuotaz - redirectURL guardada: {0}', redirectURL);
 
     return {
-      error: false,
-      redirectUrl: 'https://apurata.com'
+        authorized: true,
+        acuotazRedirectUrl: redirectURL
     };
-  } catch (e) {
-    log.error(
-      'aCuotaz Payment - Authorize - Error during authorization: {0}',
-      e.message
-    );
-    return {
-      error: true,
-      serverErrors: [Resource.msg('error.technical', 'checkout', null)]
-    };
-  }
 }
 
 module.exports = {

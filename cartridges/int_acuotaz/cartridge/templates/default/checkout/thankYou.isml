@@ -1,0 +1,14 @@
+<div class="checkout">
+    <form id="orderConfirmForm" action="${URLUtils.url('Order-Confirm')}" method="post">
+        <input type="hidden" name="orderID" value="${pdict.orderID}">
+        <input type="hidden" name="orderToken" value="${pdict.orderToken}">
+    </form>
+    <div class="d-flex flex-column align-items-center py-5">
+        <div class="spinner-border" role="status" style="width:3rem;height:3rem;"></div>
+        
+    </div>
+    <script>
+        // Auto-submit para avanzar a Order-Confirm
+        document.getElementById('orderConfirmForm').submit();
+    </script>
+</div>

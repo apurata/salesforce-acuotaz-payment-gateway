@@ -52,7 +52,8 @@ Edit `dw.json` with your instance data:
     "hostname": "your-instance.sandbox.us01.dx.commercecloud.salesforce.com",
     "username": "your-username",
     "password": "your-password",
-    "code-version": "version1",
+    // verificar que esta versión sea la activa en la tienda
+    "code-version": "original",
     "activate-code-version": true
 }
 ```
