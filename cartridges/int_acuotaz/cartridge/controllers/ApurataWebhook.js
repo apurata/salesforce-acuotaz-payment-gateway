@@ -30,49 +30,49 @@ function handleApurataEvent(order, payload, localeID) {
                         if (!placeOrderResult.error) {
                             COHelpers.sendConfirmationEmail(order, localeID);
                         } else {
-                            log.warn('Apurata Webhook - Error en placeOrder para orden {0}: {1}', order.orderNo, JSON.stringify(placeOrderResult));
+                            log.warn('aCuotaz Webhook - Error en placeOrder para orden {0}: {1}', order.orderNo, JSON.stringify(placeOrderResult));
                         }
                     }
-                    order.addNote('aCuotaz: Notifica que esta orden fue pagada y ya se puede entregar');
+                    order.addNote('aCuotaz webhook', 'aCuotaz: Notifica que esta orden fue pagada y ya se puede entregar');
                     result.message = 'Pago confirmado';
                     break;
 
                 case 'rejected':
-                    log.info('Apurata Webhook - REJECTED: Cancelando orden {0}', order.orderNo);
+                    log.info('aCuotaz Webhook - REJECTED: Cancelando orden {0}', order.orderNo);
                     OrderMgr.cancelOrder(order);
-                    order.addNote('aCuotaz: No aprobó el financiamiento');
+                    order.addNote('aCuotaz webhook', 'aCuotaz: No aprobó el financiamiento');
                     result.message = 'Orden cancelada: rejected';
                     break;
 
                 case 'canceled':
-                    log.info('Apurata Webhook - CANCELED: Cancelando orden {0}', order.orderNo);
+                    log.info('aCuotaz Webhook - CANCELED: Cancelando orden {0}', order.orderNo);
                     OrderMgr.cancelOrder(order);
-                    order.addNote('aCuotaz: Anuló el financiamiento');
+                    order.addNote('aCuotaz webhook', 'aCuotaz: Anuló el financiamiento');
                     result.message = 'Orden cancelada: canceled';
                     break;
 
                 case 'created':
-                    order.addNote('aCuotaz: Notificación de creación de solicitud (checkout iniciado)');
+                    order.addNote('aCuotaz webhook', 'aCuotaz: Notificación de creación de solicitud (checkout iniciado)');
                     result.message = 'Estado actualizado: created';
                     break;
 
                 case 'validated':
-                    order.addNote('aCuotaz: Validó identidad del usuario');
+                    order.addNote('aCuotaz webhook', 'aCuotaz: Validó identidad del usuario');
                     result.message = 'Estado actualizado: validated';
                     break;
 
                 case 'approved':
-                    order.addNote('aCuotaz: Calificó el financiamiento (Todavía no entregar producto)');
+                    order.addNote('aCuotaz webhook', 'aCuotaz: Calificó el financiamiento (Todavía no entregar producto)');
                     result.message = 'Estado actualizado: approved';
                     break;
 
                 case 'onhold':
-                    order.addNote('aCuotaz puso la orden en onhold');
+                    order.addNote('aCuotaz webhook', 'aCuotaz puso la orden en onhold');
                     result.message = 'Estado actualizado: on_hold';
                     break;
 
                 default:
-                    log.error('Apurata Webhook - Evento no reconocido: {0} para orden {1}', payload.event, order.orderNo);
+                    log.error('aCuotaz Webhook - Evento no reconocido: {0} para orden {1}', payload.event, order.orderNo);
                     result.message = 'Evento no reconocido: ' + payload.event;
                     return;
             }
@@ -80,7 +80,7 @@ function handleApurataEvent(order, payload, localeID) {
             result.success = true;
         });
     } catch (e) {
-        log.error('Apurata Webhook - Error procesando orden {0}: {1}', order.orderNo, e.message);
+        log.error('aCuotaz Webhook - Error procesando orden {0}: {1}', order.orderNo, e.message);
         result.message = 'Error interno procesando orden: ' + e.message;
     }
 
@@ -132,10 +132,6 @@ server.post('Process', server.middleware.https, function (req, res, next) {
         res.json({ error: true, message: result.message, orderId: payload.orderId });
         return next();
     }
-
-    Transaction.wrap(function () {
-        order.addNote('Apurata Webhook - Payload', JSON.stringify(payload));
-    });
 
     res.setStatusCode(200);
     res.json({
