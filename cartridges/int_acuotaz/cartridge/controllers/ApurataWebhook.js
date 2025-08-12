@@ -33,25 +33,42 @@ function handleApurataEvent(order, payload, localeID) {
                             log.warn('Apurata Webhook - Error en placeOrder para orden {0}: {1}', order.orderNo, JSON.stringify(placeOrderResult));
                         }
                     }
-                    order.addNote('Apurata Webhook', 'PAGO CONFIRMADO - listo para fulfillment');
+                    order.addNote('aCuotaz: Notifica que esta orden fue pagada y ya se puede entregar');
                     result.message = 'Pago confirmado';
                     break;
 
                 case 'rejected':
-                case 'canceled':
-                case 'expired':
-                    log.info('Apurata Webhook - {0}: Cancelando orden {1}', payload.event.toUpperCase(), order.orderNo);
+                    log.info('Apurata Webhook - REJECTED: Cancelando orden {0}', order.orderNo);
                     OrderMgr.cancelOrder(order);
-                    order.addNote('Apurata Webhook', 'Orden cancelada: ' + payload.event);
-                    result.message = 'Orden cancelada: ' + payload.event;
+                    order.addNote('aCuotaz: No aprobó el financiamiento');
+                    result.message = 'Orden cancelada: rejected';
+                    break;
+
+                case 'canceled':
+                    log.info('Apurata Webhook - CANCELED: Cancelando orden {0}', order.orderNo);
+                    OrderMgr.cancelOrder(order);
+                    order.addNote('aCuotaz: Anuló el financiamiento');
+                    result.message = 'Orden cancelada: canceled';
                     break;
 
                 case 'created':
+                    order.addNote('aCuotaz: Notificación de creación de solicitud (checkout iniciado)');
+                    result.message = 'Estado actualizado: created';
+                    break;
+
                 case 'validated':
+                    order.addNote('aCuotaz: Validó identidad del usuario');
+                    result.message = 'Estado actualizado: validated';
+                    break;
+
                 case 'approved':
+                    order.addNote('aCuotaz: Calificó el financiamiento (Todavía no entregar producto)');
+                    result.message = 'Estado actualizado: approved';
+                    break;
+
                 case 'onhold':
-                    order.addNote('Apurata Webhook', 'Estado actualizado: ' + payload.event);
-                    result.message = 'Estado actualizado: ' + payload.event;
+                    order.addNote('aCuotaz puso la orden en onhold');
+                    result.message = 'Estado actualizado: on_hold';
                     break;
 
                 default:
