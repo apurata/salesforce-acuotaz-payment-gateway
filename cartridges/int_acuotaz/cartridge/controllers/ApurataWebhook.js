@@ -39,14 +39,12 @@ function handleApurataEvent(order, payload, localeID) {
 
                 case 'rejected':
                     log.info('aCuotaz Webhook - REJECTED: Cancelando orden {0}', order.orderNo);
-                    OrderMgr.cancelOrder(order);
                     order.addNote('aCuotaz webhook', 'aCuotaz: No aprobó el financiamiento');
                     result.message = 'Orden cancelada: rejected';
                     break;
 
                 case 'canceled':
                     log.info('aCuotaz Webhook - CANCELED: Cancelando orden {0}', order.orderNo);
-                    OrderMgr.cancelOrder(order);
                     order.addNote('aCuotaz webhook', 'aCuotaz: Anuló el financiamiento');
                     result.message = 'Orden cancelada: canceled';
                     break;
