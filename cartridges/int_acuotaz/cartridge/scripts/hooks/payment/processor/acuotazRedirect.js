@@ -59,9 +59,8 @@ function Authorize(orderNumber, paymentInstrument, paymentProcessor) {
 
   var OrderMgr = require('dw/order/OrderMgr');
   var URLUtils = require('dw/web/URLUtils');
-  var HTTPClient = require('dw/net/HTTPClient');
+  var apurataSvc = require('*/cartridge/scripts/acuotaz/apurataService');
 
-  // --- 1. Recupera la orden ---
   var order = OrderMgr.getOrder(orderNumber);
   if (!order) {
     log.error('Acuotaz - no se encontró la orden {0}', orderNumber);
@@ -71,10 +70,8 @@ function Authorize(orderNumber, paymentInstrument, paymentProcessor) {
   }
 
   log.info('Acuotaz – order: {0}', JSON.stringify(order));
-  var bearerToken = Site.getCurrent().getCustomPreferenceValue('acuotazBearerToken');
   var posClientId = Site.getCurrent().getCustomPreferenceValue('acuotazPosClientId');
 
-  // --- 2. Construye el payload para la API de Apurata ---
   var payload = {
     amount: order.totalGrossPrice.value,
     order_id: order.orderNo,
@@ -95,40 +92,16 @@ function Authorize(orderNumber, paymentInstrument, paymentProcessor) {
     },
   };
 
-  // --- 3. Llama a Apurata ---
-  var client = new HTTPClient();
-  client.setTimeout(10000);
-  log.info('Acuotaz - bearerToken: {0}', bearerToken);
-  client.open('POST', 'https://apurata.com/pos/order/create');
-  client.setRequestHeader('Content-Type', 'application/json');
-  if (bearerToken) {
-    client.setRequestHeader('Authorization', 'Bearer ' + bearerToken);
-  } else {
-    log.warn('aCuotaz Payment - Handle - Bearer token no configurado en preferencias.');
-  }
-  client.send(JSON.stringify(payload));
+  var apiRes = apurataSvc.makeRequestApurata('POST', '/pos/order/create', payload);
 
-  if (client.statusCode !== 200) {
-    log.error('Acuotaz - error HTTP {0}: {1}', client.statusCode, client.text);
+  if (!(apiRes.ok && apiRes.response_json && apiRes.response_json.redirect_to)) {
+    log.error('Acuotaz - Error creando orden vía API. Status: {0} Body: {1}', apiRes.statusCode, apiRes.response_raw);
     return { error: true };
   }
 
-  var redirectURL;
-  try {
-    var responseObj = JSON.parse(client.text);
-    log.info('Acuotaz - responseObj: {0}', JSON.stringify(responseObj.redirect_to));
-    redirectURL = responseObj.redirect_to;
-  } catch (e) {
-    log.error('Acuotaz - no se pudo parsear la respuesta: {0}', e.message);
-    return { error: true };
-  }
+  var redirectURL = apiRes.response_json.redirect_to;
+  log.info('Acuotaz - redirect URL obtenida: {0}', redirectURL);
 
-  if (!redirectURL) {
-    log.error('Acuotaz - la respuesta no contiene redirect_url');
-    return { error: true };
-  }
-
-  // --- 4. Marca la orden como NO PAGADA y asigna la transacción ---
   var Order = require('dw/order/Order');
   Transaction.wrap(function () {
     order.setPaymentStatus(Order.PAYMENT_STATUS_NOTPAID);
@@ -136,7 +109,7 @@ function Authorize(orderNumber, paymentInstrument, paymentProcessor) {
     paymentInstrument.paymentTransaction.setTransactionID(orderNumber);
     paymentInstrument.paymentTransaction.setPaymentProcessor(paymentProcessor);
 
-    // Guarda la URL generada por aCuotaz (custom.redirectURL debe existir o elimínalo)
+    // Guarda la URL generada por aCuotaz (custom.redirectURL debe existir en Business Manager)
     order.custom.redirectURL = redirectURL;
   });
 

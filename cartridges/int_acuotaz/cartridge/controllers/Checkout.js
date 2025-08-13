@@ -6,6 +6,8 @@ var URLUtils = require('dw/web/URLUtils');
 var BasketMgr = require('dw/order/BasketMgr');
 var Transaction = require('dw/system/Transaction');
 
+var eligibilityHelper = require('*/cartridge/scripts/acuotaz/eligibility');
+
 var Logger = require('dw/system/Logger').getLogger('int_acuotaz', 'acuotaz');
 
 server.extend(module.superModule);
@@ -55,6 +57,13 @@ server.get('Failure', server.middleware.https, function (req, res, next) {
     });
   }
   res.redirect(URLUtils.https('Checkout-Begin', 'stage', 'payment'));
+  return next();
+});
+
+server.append('Begin', server.middleware.https, function (req, res, next) {
+  var basket = BasketMgr.getCurrentBasket();
+  var acuotazAllowed = eligibilityHelper.isEligible(basket);
+  res.setViewData({ acuotazAllowed: acuotazAllowed });
   return next();
 });
 

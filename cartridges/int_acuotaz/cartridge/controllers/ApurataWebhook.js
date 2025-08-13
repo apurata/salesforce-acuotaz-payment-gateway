@@ -5,6 +5,7 @@ var Logger      = require('dw/system/Logger');
 var OrderMgr    = require('dw/order/OrderMgr');
 var Order       = require('dw/order/Order');
 var Transaction = require('dw/system/Transaction');
+var BasketMgr   = require('dw/order/BasketMgr');
 var COHelpers   = require('*/cartridge/scripts/checkout/checkoutHelpers');
 
 /**
@@ -47,6 +48,7 @@ function handleApurataEvent(order, payload, localeID) {
                     log.info('aCuotaz Webhook - CANCELED: Cancelando orden {0}', order.orderNo);
                     order.addNote('aCuotaz webhook', 'aCuotaz: Anuló el financiamiento');
                     result.message = 'Orden cancelada: canceled';
+                    OrderMgr.cancelOrder(order);
                     break;
 
                 case 'created':
