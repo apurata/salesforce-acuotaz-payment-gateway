@@ -61,6 +61,9 @@ server.get('Failure', server.middleware.https, function (req, res, next) {
 });
 
 server.append('Begin', server.middleware.https, function (req, res, next) {
+  var assets = require('*/cartridge/scripts/assets.js');
+  assets.addJs('/js/acuotazCheckout.js');
+
   var basket = BasketMgr.getCurrentBasket();
   var acuotazAllowed = eligibilityHelper.isEligible(basket);
   res.setViewData({ acuotazAllowed: acuotazAllowed });
