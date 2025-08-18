@@ -80,8 +80,6 @@ function Authorize(orderNumber, paymentInstrument, paymentProcessor) {
     url_redir_on_canceled: URLUtils.https('Checkout-Failure', 'orderID', order.orderNo).toString(),
     url_redir_on_rejected: URLUtils.https('Checkout-Failure', 'orderID', order.orderNo).toString(),
     url_redir_on_success: URLUtils.https('Checkout-ThankYou', 'orderID', order.orderNo).toString(),
-    url_redir_on_order_detail: URLUtils.https('Checkout-ThankYou', 'orderID', order.orderNo).toString(),
-    url_redir_on_downpayment: URLUtils.https('Checkout-ThankYou', 'orderID', order.orderNo).toString(),
     customer_data: {
       address: order.billingAddress.address1,
       dni: order.customerNo || '',
