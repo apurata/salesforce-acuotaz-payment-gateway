@@ -1,0 +1,12 @@
+{
+    "hooks": [
+        {
+            "name": "app.payment.processor.acuotaz_pm",
+            "script": "./hooks/payment/processor/acuotazRedirect"
+        },
+        {
+            "name": "app.payment.form.processor.acuotaz_pm",
+            "script": "./hooks/payment/processor/acuotazFormProcessor"
+        }
+    ]
+}

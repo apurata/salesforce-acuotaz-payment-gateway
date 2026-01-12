@@ -52,7 +52,8 @@ Edit `dw.json` with your instance data:
     "hostname": "your-instance.sandbox.us01.dx.commercecloud.salesforce.com",
     "username": "your-username",
     "password": "your-password",
-    "code-version": "version1",
+    // verificar que esta versión sea la activa en la tienda
+    "code-version": "original",
     "activate-code-version": true
 }
 ```
@@ -199,3 +200,16 @@ If you encounter problems:
 ---
 
 **Note:** This guide is based on the latest version of SFRA. Steps may vary slightly depending on the specific version of your Salesforce Commerce Cloud instance.
+
+### Acuotaz Bearer Token
+Configura tus credenciales una sola vez y olvídate del código:
+
+**Valores requeridos**
+* **Acuotaz Bearer Token** – se usa en la cabecera `Authorization`.
+* **Acuotaz POS Client ID** – se envía en el payload `pos_client_id`.
+
+1. En Business Manager ve a **Administration → Site Development → Import & Export**.  En la sección *Meta Data*, **sube** (Upload) el archivo `site-preferences-acuotaz.xml` y luego haz **Import** para procesarlo.
+2. Cuando la importación termine, ve a **Merchant Tools → Site Preferences → Custom Preferences → Acuotaz**.
+3. Completa los dos campos y guarda:
+   * **Acuotaz Bearer Token**
+   * **Acuotaz POS Client ID**

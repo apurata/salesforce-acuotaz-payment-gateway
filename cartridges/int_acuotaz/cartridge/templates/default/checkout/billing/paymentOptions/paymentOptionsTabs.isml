@@ -1,0 +1,8 @@
+<isloop items="${pdict.order.billing.payment.applicablePaymentMethods}" var="pm">
+    <isif condition="${pm.ID === 'CREDIT_CARD'}">
+        <isinclude template="checkout/billing/paymentOptions/creditCardTab" />
+    </isif>
+    <isif condition="${pm.ID === 'ACUOTAZ_PM' && pdict.acuotazAllowed}">
+        <isinclude template="checkout/billing/paymentOptions/acuotazTab" />
+    </isif>
+</isloop>

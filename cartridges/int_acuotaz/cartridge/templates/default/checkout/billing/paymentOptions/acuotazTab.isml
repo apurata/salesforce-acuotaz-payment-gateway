@@ -1,0 +1,10 @@
+<li class="nav-item" data-method-id="ACUOTAZ_PM">
+    <a class="nav-link acuotaz-tab" data-toggle="tab" href="#acuotaz-content" role="tab">
+        <img class="credit-card-option"
+                src="https://apurata.com/app/img/logo-acuotaz.png"
+                height="32"
+                alt="${Resource.msg('msg.payment.type.acuotaz', 'payment', null)}"
+                title="${Resource.msg('msg.payment.type.acuotaz', 'payment', null)}"
+        >
+    </a>
+</li> 
